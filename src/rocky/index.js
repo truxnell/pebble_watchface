@@ -1,17 +1,15 @@
 var rocky = require('rocky');
 
+var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+  'Oct', 'Nov', 'Dec'];
+var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+var settings = null;
 
 rocky.on('draw', function(event) {
   // Get the CanvasRenderingContext2D object
   // hour
   var ctx = event.context;
-
-  // Minute glasses
-  var m1 = event.context;
-  var m2 = event.context;
-  var m3 = event.context;
-  var m4 = event.context;
-
   // Clear the screen
   ctx.clearRect(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
 
@@ -24,49 +22,114 @@ rocky.on('draw', function(event) {
   var th = d.getHours();
   var tm = d.getMinutes();
 
-  // Positioning
+  // Variables
   var TextTop = (h/2)-22;
-  var BoxWidth = 17;
-  var BoxStartX = 55
+  var BoxSpace = 6;
+  var TimeLeft = tm;
+  var BoxFill = 0;
+  var BoxEdgeSpaces = 15;
+  var BoxStartX = 0;
+  // Calculate box width dynamical based on watch size
+  var BoxWidth = (w - (2 * BoxEdgeSpaces) - (4 * BoxSpace))/4;
+  var CurrentX = BoxStartX + BoxEdgeSpaces;
+
+  var HourColour = 'white';
+  var BoxFillC = 'white';
+  var BoxOutline = 'white';
+  var BoxFillPartialC = 'white';
+
+  if (settings) {
+
+    HourColour = cssColor(settings.HourColour)
+    BoxFillC = cssColor(settings.BoxFillC)
+    BoxOutline = cssColor(settings.BoxOutline)
+    BoxFillPartialC = cssColor(settings.BoxFillPartialC)
+    
+  }
+
+  // Line width
+  ctx.lineWidth=2;
 
   // Hour Number
-  ctx.fillStyle = 'white';
-  ctx.font = '42px bold Bitham';
-  ctx.textAlign = 'left';
-  ctx.fillText(th, 2, TextTop, w);
+  ctx.fillStyle = HourColour;
+  //ctx.font = '42px bold Bitham';
+  ctx.font = '49px Roboto-subset'
+  ctx.textAlign = 'center';
+  ctx.fillText(th, w/2, TextTop-50, w);
 
-  m1.fillStyle = 'white';
-  m1.fillRect(BoxStartX, TextTop + 13, BoxWidth, 28);
+  // Date
+  var clockDate = dayNames[d.getDay()] + ' ' + d.getDate() + ' ' + monthNames[d.getMonth()];
+  ctx.font = '24px bold Gothic';
+  ctx.textAlign = 'center';
+  ctx.fillText(clockDate, w / 2, TextTop+70);
 
-  m2.fillStyle = 'white';
-  m2.fillRect(BoxStartX+BoxWidth, TextTop + 13, BoxWidth, 28);
+  var i = 0;
+  for(i=0; i<4; i++) {
 
-  m3.fillStyle = 'white';
-  m3.fillRect(BoxStartX+(BoxWidth*2), TextTop + 13, BoxWidth, 28);
+    ctx.strokeStyle = BoxOutline;
+    ctx.strokeRect(CurrentX, TextTop+13, BoxWidth, 28);
+    // Figure out if box is whole or partial
+    // And calculate.  Remove 15mins from count
+    if(TimeLeft>15) {
 
-  m4.fillStyle = 'white';
-  m4.fillRect(BoxStartX+(BoxWidth*3), TextTop + 13, BoxWidth, 28);
+      // Make a full box, and use the full colour
+      BoxFill = BoxWidth;
+      ctx.fillStyle = BoxFillC;
+    } else {
+      // Make a partial box, and use the partial colour
+      BoxFill = TimeLeft / 15 * BoxWidth;
+      ctx.fillStyle = BoxFillPartialC;
 
-  //graphics_fill_radial(m1,rect,GOvalScaleModeFitCircle,10,DEG_TO_TRIANGLE(142),DEG_TO_TRIANGLE(402));
+    }
 
-  //ctm.fillStyle = 'white';
-  //ctm.font = '42px light Bitham';
-  //ctm.textAlign = 'left';
-  //ctm.fillText(lt, wv, lv, w);
+    if(TimeLeft > 0) {ctx.fillRect(CurrentX, TextTop + 13, BoxFill, 28);}
+    CurrentX = CurrentX + BoxWidth + BoxSpace;
+    TimeLeft = TimeLeft - 15;
 
-  //ctd.fillStyle = 'gray';
-  //ctd.font = '14px Gothic';
-  //ctd.textAlign = 'center';
-  //ctd.fillText(zork(), w/2, h-20, w);
+  }
 
 });
 
 // -- TIME CHANGE EVENTS
 
 rocky.on('minutechange',function(event){
-  // Display a message in the system logs
-  //console.log("Another minute with your Pebble!");
+    // Request the screen to be redrawn on next pass
+  rocky.requestDraw();
 
-  // Request the screen to be redrawn on next pass
+});
+rocky.on('message', function(event) {
+  settings = event.data;
+});
+
+rocky.on('secondchange', function(e) {
   rocky.requestDraw();
 });
+
+rocky.postMessage({command: 'settings'});
+
+// Liberated from Clay.js
+function cssColor(color) {
+  if (typeof color === 'number') {
+    color = color.toString(16);
+  } else if (!color) {
+    return 'transparent';
+  }
+
+  color = padColorString(color);
+
+  return '#' + color;
+}
+
+/**
+ * @param {string} color
+ * @return {string}
+ */
+function padColorString(color) {
+  color = color.toLowerCase();
+
+  while (color.length < 6) {
+    color = '0' + color;
+  }
+
+  return color;
+}
