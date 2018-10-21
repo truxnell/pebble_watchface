@@ -37,6 +37,18 @@ rocky.on('draw', function(event) {
   var BoxFillC = 'green';
   var BoxOutline = 'green';
   var BoxFillPartialC = 'red';
+<<<<<<< HEAD
+=======
+
+  if (settings) {
+
+    HourColour = cssColor(settings.HourColour)
+    BoxFillC = cssColor(settings.BoxFillC)
+    BoxOutline = cssColor(settings.BoxOutline)
+    BoxFillPartialC = cssColor(settings.BoxFillPartialC)
+
+  }
+>>>>>>> d98cf721ab46f063707a59ce0586fa150f1bc71a
 
   // Line width
   ctx.lineWidth=2;
