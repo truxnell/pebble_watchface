@@ -33,10 +33,10 @@ rocky.on('draw', function(event) {
   var BoxWidth = (w - (2 * BoxEdgeSpaces) - (4 * BoxSpace))/4;
   var CurrentX = BoxStartX + BoxEdgeSpaces;
 
-  var HourColour = 'white';
-  var BoxFillC = 'white';
-  var BoxOutline = 'white';
-  var BoxFillPartialC = 'white';
+  var HourColour = 'green';
+  var BoxFillC = 'green';
+  var BoxOutline = 'green';
+  var BoxFillPartialC = 'red';
 
   if (settings) {
 
@@ -44,7 +44,7 @@ rocky.on('draw', function(event) {
     BoxFillC = cssColor(settings.BoxFillC)
     BoxOutline = cssColor(settings.BoxOutline)
     BoxFillPartialC = cssColor(settings.BoxFillPartialC)
-    
+
   }
 
   // Line width
@@ -102,7 +102,9 @@ rocky.on('message', function(event) {
 });
 
 rocky.on('secondchange', function(e) {
-  rocky.requestDraw();
+  // Not keen on what I suspect is battery drain
+  // Will see if this call was the culprit
+  // rocky.requestDraw();
 });
 
 rocky.postMessage({command: 'settings'});

@@ -1,5 +1,5 @@
 {
-  "name": "nat",
+  "name": "FuzzyTime",
   "author": "Nat Allan",
   "version": "0.1.0",
   "keywords": ["pebble-app"],
@@ -10,7 +10,7 @@
       "rockyjs": "src/rocky/index.js",
       "pkjs": "src/pkjs/index.js"
     },
-    "displayName": "Nat",
+    "displayName": "FuzzyTime",
     "uuid": "5c4d9a0e-4e6c-4d2a-9435-59658288385b",
     "projectType": "rocky",
     "sdkVersion": "3",
